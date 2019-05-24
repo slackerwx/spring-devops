@@ -1,0 +1,1 @@
+[![Build Status](http://localhost:8080/buildStatus/icon?job=spring-devops%2Ffeature%252Fjenkins)](http://localhost:8080/job/spring-devops/job/feature%252Fjenkins/)
