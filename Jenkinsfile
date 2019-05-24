@@ -6,6 +6,9 @@ pipeline {
         }
 
     }
+    options {
+        skipStagesAfterUnstable()
+    }
     stages {
         stage('Build') {
             steps {
