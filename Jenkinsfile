@@ -22,6 +22,13 @@ pipeline {
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
+                    step([
+                        $class           : 'JacocoPublisher',
+                        execPattern      : 'target/jacoco/jacoco.exec',
+                        classPattern     : 'target/classes/main',
+                        sourcePattern    : 'src/main/java',
+                        exclusionPattern : '**/*Test.class'
+                    ])
                     publishHTML([
                         allowMissing         : false,
                         alwaysLinkToLastBuild: false,
