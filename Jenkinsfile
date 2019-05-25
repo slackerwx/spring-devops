@@ -43,7 +43,7 @@ pipeline {
         }
         stage('Sonar scan execution'){
             steps{
-                sh 'mvn verify sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true'
+                sh 'mvn verify sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true'
             }
         }
         stage('Sonar scan result check') {

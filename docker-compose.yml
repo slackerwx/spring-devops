@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  jenkins:
+    image: jenkinsci/blueocean
+    volumes:
+      - ./docker/jenkins/jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - jenkins
+    ports:
+      - 8080:8080
+      - 50000:50000
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube
+    networks:
+      - jenkins
+    ports:
+      - 9000:9000
+
+networks:
+  jenkins:
+    driver: bridge
