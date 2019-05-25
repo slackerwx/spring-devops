@@ -1,10 +1,17 @@
+// http://jesseyates.com/2018/09/16/dockerizing-jenkins-maven-builds.html
+DOCKER_MAVEN_IMAGE = 'maven:3-alpine'
+// Bind workspace m2 repo to not download internet too many times.
+// New builds will have to download jars once, but should have minimal thrash for later runs.
+// We don't bind $HOME/.m2 to ensure independence across builds
+DOCKER_MAVEN_ARGS = '-v $HOME/.m2/builds/$BRANCH_NAME:/root/.m2 -u 0:0'
+
+
 pipeline {
     agent {
         docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
+            image DOCKER_MAVEN_IMAGE
+            args DOCKER_MAVEN_ARGS
         }
-
     }
     options {
         skipStagesAfterUnstable()
@@ -41,9 +48,11 @@ pipeline {
                 }
             }
         }
-        stage('Sonar scan execution'){
-            steps{
-                sh 'mvn verify sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true'
+        stage('Sonar scan execution') {
+            steps {
+                withSonarQubeEnv('My SonarQube Server') {
+                    sh "mvn verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
+                }
             }
         }
         stage('Sonar scan result check') {
