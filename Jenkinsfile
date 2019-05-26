@@ -48,14 +48,14 @@ pipeline {
                 }
             }
         }
-        stage('Sonar scan execution') {
+        stage('SonarQube analysis') {
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
                     sh "mvn verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
                 }
             }
         }
-        stage('Sonar scan result check') {
+        stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
                     retry(3) {
