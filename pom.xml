@@ -19,6 +19,14 @@
         <junit.jupiter.version>5.5.0-M1</junit.jupiter.version>
     </properties>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>artifactory</id>
+            <name>artifactory</name>
+            <url>http://artifactory:8081/artifactory/example-repo-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

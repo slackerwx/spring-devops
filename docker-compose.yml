@@ -1,11 +1,12 @@
-version: '2'
+version: '3.1'
 
 services:
   jenkins:
-    image: jenkinsci/blueocean
+    build: ./docker/jenkins
     volumes:
       - ./docker/jenkins/jenkins_data:/var/jenkins_home
       - $HOME:/home
+      - ./docker/jenkins/downloads:/var/jenkins_home/downloads
     networks:
       - jenkins
     ports:
@@ -13,13 +14,19 @@ services:
       - 50000:50000
     environment:
       - DOCKER_HOST=tcp://socat:2375
-      - SONARQUBE_HOST=http://sonarqube:9000
+    depends_on:
+      - socat
+      - sonarqube
+      - artifactory
     links:
       - socat
       - sonarqube
+    secrets:
+      - artifactoryPassword
   #https://medium.com/@mingheng/solving-permission-denied-while-trying-to-connect-to-docker-daemon-socket-from-container-in-mac-os-600c457f1276
   #https://hub.docker.com/r/alpine/socat/
   socat:
+    container_name: socat
     image: alpine/socat
     command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
     volumes:
@@ -36,7 +43,20 @@ services:
       - jenkins
     ports:
       - 9000:9000
+    expose:
+      - "9000"
+  artifactory:
+    container_name: artifactory
+    image: docker.bintray.io/jfrog/artifactory-cpp-ce:latest
+    ports:
+      - 8081:8081
+    expose:
+      - "8081"
 
 networks:
   jenkins:
     driver: bridge
+
+secrets:
+  artifactoryPassword:
+    file: ./docker/artifactory/secrets/artifactoryPassword
