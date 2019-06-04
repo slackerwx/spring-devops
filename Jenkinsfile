@@ -10,19 +10,16 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build and Test') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                echo 'Pulling...' + env.BRANCH_NAME
+                sh 'mvn -Dintegration-tests.skip=true clean package'
             }
-        }
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    junit 'target/surefire-reports/TEST*.xml'
+                    archive 'target/*.jar'
                     step([
                             $class          : 'JacocoPublisher',
                             execPattern     : 'target/jacoco/jacoco.exec',
@@ -36,17 +33,23 @@ pipeline {
                             keepAll              : true,
                             reportDir            : 'target/site/jacoco',
                             reportFiles          : 'index.html',
-                            reportTitles         : "API Documentation",
-                            reportName           : "API Documentation"
+                            reportTitles         : "API Report",
+                            reportName           : "API Report"
                     ])
                 }
+            }
+        }
+
+        stage('Integration tests') {
+            steps {
+                sh "mvn verify -Dunit-tests.skip=true"
             }
         }
 
         stage('SonarQube analysis') {
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
-                    sh "mvn verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
+                    sh "mvn verify sonar:sonar -Dintegration-tests.skip=true -Dunit-tests.skip=true"
                 }
             }
         }
@@ -70,7 +73,7 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'our_settings', variable: 'SETTINGS')]) {
                     echo "$SETTINGS"
-                    sh "mvn -s $SETTINGS deploy -DskipTests"
+                    sh "mvn -s $SETTINGS -Dintegration-tests.skip=true -Dintegration-tests.skip=true deploy"
                 }
             }
         }
