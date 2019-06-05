@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DeployController.class)
-class DeployControllerTest {
+class DeployControllerIT {
 
     private static final Long DEPLOY_ID = 5L;
 
