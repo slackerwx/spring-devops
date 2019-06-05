@@ -6,7 +6,7 @@ docker-compose down
 ./downloads.sh
 
 #update with actual password
-echo "password" > ./docker/artifactory/secrets/artifactoryPassword
+echo "YOUR_PASSWORD_HERE" > ./docker/artifactory/secrets/artifactoryPassword
 
 #update older jenkins image, make sure it doesnt use cache
 docker-compose build --no-cache
